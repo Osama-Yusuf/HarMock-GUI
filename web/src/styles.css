@@ -1,0 +1,81 @@
+::root {
+    font-family: ui-sans-serif, system-ui, Arial;
+    color-scheme: light dark;
+}
+
+body {
+    margin: 0;
+    padding: 0 16px 48px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 12px 0;
+}
+
+.upload {
+    border: 2px dashed #aaa;
+    padding: 24px;
+    text-align: center;
+}
+
+.endpoints {
+    overflow: auto;
+}
+
+.panes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+pre {
+    background: #1112;
+    padding: 8px;
+    border-radius: 6px;
+    overflow: auto;
+    max-height: 300px;
+}
+
+code {
+    background: #1112;
+    padding: 1px 4px;
+    border-radius: 4px;
+}
+
+button {
+    padding: 6px 10px;
+}
+
+button.link {
+    background: none;
+    border: none;
+    color: #06c;
+    cursor: pointer;
+    padding: 0;
+}
+
+.hint {
+    color: #666;
+    font-size: 12px;
+}

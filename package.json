@@ -1,0 +1,24 @@
+{
+    "name": "har-mock-mvp",
+    "private": true,
+    "workspaces": [
+        "server",
+        "web"
+    ],
+    "scripts": {
+        "dev": "concurrently -k \"npm:dev:server\" \"npm:dev:web\"",
+        "dev:server": "cross-env DEV_PROXY=1 tsx server/src/index.ts",
+        "dev:web": "npm -w web run dev",
+        "build": "npm -w web run build && npm -w server run build",
+        "start": "node server/dist/index.js",
+        "test": "npm -w server run test",
+        "suite": "tsx scripts/suite-runner.ts"
+    },
+    "devDependencies": {
+        "concurrently": "^9.0.1",
+        "cross-env": "^7.0.3",
+        "tsx": "^4.19.2",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.5.4"
+    }
+}
