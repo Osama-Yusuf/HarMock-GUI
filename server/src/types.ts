@@ -1,4 +1,5 @@
 export type Mode = 'sequence' | 'endpoint';
+export type BodyMode = 'scrubbed' | 'original';
 
 export interface MockEntry {
     id: string;
@@ -50,6 +51,7 @@ export interface Suite {
 export interface Mock {
     id: string;
     mode: Mode;
+    bodyMode?: BodyMode;
     simulateDelay: boolean;
     createdAt: number;
     entries: MockEntry[];

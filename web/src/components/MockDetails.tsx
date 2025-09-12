@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function MockDetails({ mock, onToggleMode, onToggleDelay }: any) {
+export default function MockDetails({ mock, onToggleMode, onToggleDelay, onToggleBodyMode }: any) {
     const root = `${location.origin}/m/${mock.id}`;
     return (
         <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm p-4">
@@ -19,6 +19,13 @@ export default function MockDetails({ mock, onToggleMode, onToggleDelay }: any) 
                     </label>
                     <label className="flex items-center gap-2">Delay:
                         <input type="checkbox" checked={mock.simulateDelay} onChange={e => onToggleDelay(e.target.checked)} />
+                    </label>
+                    <span className="h-5 w-px bg-slate-300 dark:bg-slate-700" />
+                    <label className="flex items-center gap-2">Body:
+                        <select className="border rounded px-2 py-1 bg-white dark:bg-slate-800" value={mock.bodyMode || 'scrubbed'} onChange={e => onToggleBodyMode(e.target.value as any)}>
+                            <option value="scrubbed">scrubbed</option>
+                            <option value="original">original</option>
+                        </select>
                     </label>
                 </div>
             </div>

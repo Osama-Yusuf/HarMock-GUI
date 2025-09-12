@@ -22,6 +22,13 @@ export default function App() {
     async function onUpload(file: File) { const { mockId } = await uploadHar(file); setMockId(mockId); }
     async function onToggleMode(mode: 'sequence' | 'endpoint') { if (!mockId) return; await setMock(mockId, { mode }); await refresh(); }
     async function onToggleDelay(simulateDelay: boolean) { if (!mockId) return; await setMock(mockId, { simulateDelay }); await refresh(); }
+    async function onToggleBodyMode(bodyMode: 'scrubbed' | 'original') {
+        if (!mockId) return;
+        await setMock(mockId, { bodyMode });
+        await refresh();
+        await loadEntries();
+        if (selectedEntry?.id) setSelectedEntry(await getEntry(mockId, selectedEntry.id));
+    }
     async function onSelectEntry(id: string) { if (!mockId) return; setSelectedEntry(await getEntry(mockId, id)); }
 
     async function onCreateSuite(name: string) {
@@ -36,7 +43,7 @@ export default function App() {
             {!mockId && <Upload onUpload={onUpload} />}
             {mock && (
                 <>
-                    <MockDetails mock={mock} onToggleMode={onToggleMode} onToggleDelay={onToggleDelay} />
+                    <MockDetails mock={mock} onToggleMode={onToggleMode} onToggleDelay={onToggleDelay} onToggleBodyMode={onToggleBodyMode} />
                     <EntryTable entries={entries} filters={filters} setFilters={setFilters} selectedIds={selectedIds} setSelectedIds={setSelectedIds} onSelect={onSelectEntry} mockId={mock.id} />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <EntryInspector entry={selectedEntry} />
