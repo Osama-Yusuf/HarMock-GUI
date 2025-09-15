@@ -75,7 +75,9 @@ export async function mockRoutes(f: FastifyInstance) {
         // If HTML, inject prefixing script so in-app fetch/XHR hit the mock root
         const ctLower = (headersOut['content-type'] || '').toLowerCase();
         if (bodyBuf && ctLower.includes('text/html')) {
-            const injected = injectPrefixScript(bodyBuf.toString('utf8'), mock.id);
+            // Remove CSP response header for HTML so local scripts can load while mocking
+            delete (headersOut as any)['content-security-policy'];
+            const injected = injectPrefixScript(stripMetaCsp(bodyBuf.toString('utf8')), mock.id);
             if (injected !== null) {
                 delete (headersOut as any)['content-length'];
                 delete (headersOut as any)['etag'];
@@ -108,5 +110,10 @@ function injectPrefixScript(html: string, mockId: string): string | null {
     if (html.includes('</head>')) return html.replace('</head>', script + '\n</head>');
     if (html.includes('</body>')) return html.replace('</body>', script + '\n</body>');
     return html + script;
+}
+
+function stripMetaCsp(html: string): string {
+    // Remove <meta http-equiv="Content-Security-Policy" ...>
+    return html.replace(/<meta[^>]*http-equiv=["']Content-Security-Policy["'][^>]*>\s*/gi, '');
 }
 
