@@ -1,16 +1,64 @@
 import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Badge } from './ui/badge';
+import { Download, TestTube, Terminal } from 'lucide-react';
 
 export default function SuitePanel({ onCreate, selectedCount }: { onCreate: (name: string) => void; selectedCount: number }) {
     const [name, setName] = useState('regression-suite');
+    
     return (
-        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm p-4">
-            <h3 className="text-lg font-semibold mb-2">Create Suite</h3>
-            <div className="flex items-center gap-2 mb-2">
-                <input className="flex-1 border rounded px-3 py-2" value={name} onChange={e => setName(e.target.value)} />
-                <button className="px-3 py-2 rounded bg-blue-600 text-white disabled:opacity-50" disabled={!selectedCount} onClick={() => onCreate(name)}>Download suite.json ({selectedCount} items)</button>
-            </div>
-            <p className="text-slate-500 text-xs">Run: <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800">npm run suite -- --target http://localhost:3000 --suite ./suite.json</code></p>
-        </div>
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <TestTube className="h-5 w-5" />
+                    Create Test Suite
+                </CardTitle>
+                <CardDescription>
+                    Generate a test suite from selected entries
+                </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">Suite Name</label>
+                    <Input 
+                        value={name} 
+                        onChange={e => setName(e.target.value)}
+                        placeholder="Enter suite name"
+                    />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Selected entries:</span>
+                        <Badge variant={selectedCount > 0 ? "default" : "secondary"}>
+                            {selectedCount}
+                        </Badge>
+                    </div>
+                </div>
+                
+                <Button 
+                    className="w-full" 
+                    disabled={!selectedCount} 
+                    onClick={() => onCreate(name)}
+                >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download suite.json ({selectedCount} items)
+                </Button>
+                
+                <div className="space-y-2 p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                        <Terminal className="h-4 w-4" />
+                        Usage Instructions
+                    </div>
+                    <code className="text-xs bg-background px-2 py-1 rounded block">
+                        npm run suite -- --target http://localhost:3000 --suite ./suite.json
+                    </code>
+                </div>
+            </CardContent>
+        </Card>
     );
 }
 
