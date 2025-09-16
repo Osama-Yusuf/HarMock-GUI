@@ -128,9 +128,9 @@ export default function App() {
                     <div className="text-center flex-1 space-y-2">
                         <h1 
                             className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent glitch-title"
-                            data-text="HARMOCK"
+                            data-text="HARMOCK-GUI"
                         >
-                            HarMock
+                            HarMock-GUI
                         </h1>
                         <p className="text-muted-foreground text-lg">
                             Transform your HAR files into powerful mock APIs
