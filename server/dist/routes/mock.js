@@ -52,8 +52,8 @@ export async function mockRoutes(f) {
             if (!entry)
                 return reply.code(404).send({ error: 'no-match' });
         }
-        if (mock.simulateDelay && entry.waitMs && entry.waitMs > 0) {
-            await sleep(entry.waitMs);
+        if (mock.simulateDelay && entry.time && entry.time > 0) {
+            await sleep(Math.floor(entry.time));
         }
         const headersOut = { ...entry.respHeaders };
         // Never set sensitive headers
