@@ -1,6 +1,6 @@
 {
     "name": "harmock-gui",
-    "version": "1.0.1",
+    "version": "1.0.0",
     "description": "Transform HAR files into powerful mock APIs with a beautiful web interface",
     "main": "server/dist/index.js",
     "bin": {

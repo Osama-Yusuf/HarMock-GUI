@@ -1,4 +1,4 @@
-# 🚀 Harmock
+# 🚀 HarMock-GUI
 
 Transform HAR files into powerful mock APIs with a beautiful web interface. Perfect for development, testing, and API prototyping.
 
@@ -34,14 +34,14 @@ npx harmock-gui
 harmock-gui
 ```
 
-Open http://localhost:5173 and start uploading HAR files!
+Open http://localhost:3000 and start uploading HAR files!
 
 ### Development
 
 ```bash
 # Clone and install
-git clone https://github.com/Osama-Yusuf/HarMock
-cd HarMock
+git clone https://github.com/Osama-Yusuf/HarMock-GUI
+cd HarMock-GUI
 npm install
 
 # Development mode
