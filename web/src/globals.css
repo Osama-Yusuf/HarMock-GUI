@@ -69,21 +69,33 @@
     @apply bg-background text-foreground;
   }
   
-  /* Remove thick white borders from focus states */
-  *:focus {
+  /* Remove ALL borders and focus states globally */
+  *,
+  *:before,
+  *:after,
+  *:focus,
+  *:focus-visible,
+  *:focus-within {
     outline: none !important;
     box-shadow: none !important;
+    border: none !important;
   }
   
-  /* Remove default button focus styles */
-  button:focus,
-  input:focus,
-  textarea:focus,
-  select:focus,
-  .card:focus,
-  [role="button"]:focus {
-    outline: none !important;
-    box-shadow: none !important;
+  /* Restore only necessary borders with proper styling */
+  .card,
+  [data-card],
+  .border,
+  input,
+  textarea,
+  select,
+  button {
+    border: 1px solid hsl(var(--border)) !important;
+  }
+  
+  /* Table borders */
+  table,
+  th,
+  td {
     border: 1px solid hsl(var(--border)) !important;
   }
   
@@ -100,13 +112,6 @@
   .glitch-title:hover {
     transform: scale(1.02);
     text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
-  }
-  
-  /* Specifically target table borders */
-  table,
-  th,
-  td {
-    border: 1px solid hsl(var(--border)) !important;
   }
 }
 
