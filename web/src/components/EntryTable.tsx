@@ -1,9 +1,63 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 
 export default function EntryTable({ entries, filters, setFilters, selectedIds, setSelectedIds, onSelect, mockId }: any) {
+    const [sortField, setSortField] = useState<string | null>(null);
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
     function toggle(id: string) {
         if (selectedIds.includes(id)) setSelectedIds(selectedIds.filter((x: string) => x !== id));
         else setSelectedIds([...selectedIds, id]);
+    }
+
+    function handleSort(field: string) {
+        if (sortField === field) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDirection('asc');
+        }
+    }
+
+    const sortedEntries = [...entries].sort((a, b) => {
+        if (!sortField) return 0;
+        
+        let aVal = a[sortField];
+        let bVal = b[sortField];
+        
+        if (sortField === 'time') {
+            aVal = a.time || 0;
+            bVal = b.time || 0;
+        }
+        
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+            return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        }
+        
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+            return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+        }
+        
+        return 0;
+    });
+
+    function SortableHeader({ field, children }: { field: string; children: React.ReactNode }) {
+        const isActive = sortField === field;
+        return (
+            <th 
+                className="py-1 pr-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 select-none"
+                onClick={() => handleSort(field)}
+            >
+                <div className="flex items-center gap-1">
+                    {children}
+                    {isActive && (
+                        sortDirection === 'asc' ? 
+                        <ChevronUp className="h-3 w-3" /> : 
+                        <ChevronDown className="h-3 w-3" />
+                    )}
+                </div>
+            </th>
+        );
     }
     return (
         <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm p-4">
@@ -14,11 +68,19 @@ export default function EntryTable({ entries, filters, setFilters, selectedIds, 
             <div className="overflow-auto">
                 <table className="min-w-full text-sm">
                     <thead className="text-left text-slate-500">
-                        <tr><th className="py-1 pr-2"></th><th className="py-1 pr-2">#</th><th className="py-1 pr-2">Method</th><th className="py-1 pr-2">Path</th><th className="py-1 pr-2">Status</th><th className="py-1 pr-2">Time</th><th className="py-1">Curl</th></tr>
+                        <tr>
+                            <th className="py-1 pr-2"></th>
+                            <SortableHeader field="orderIdx">#</SortableHeader>
+                            <SortableHeader field="method">Method</SortableHeader>
+                            <SortableHeader field="path">Path</SortableHeader>
+                            <SortableHeader field="status">Status</SortableHeader>
+                            <SortableHeader field="time">Time</SortableHeader>
+                            <th className="py-1">Curl</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        {entries.map((e: any) => (
-                            <tr key={e.id} className="border-t border-slate-100 dark:border-slate-800">
+                        {sortedEntries.map((e: any) => (
+                            <tr key={e.id} className="border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                                 <td className="py-1 pr-2"><input type="checkbox" checked={selectedIds.includes(e.id)} onChange={() => toggle(e.id)} /></td>
                                 <td className="py-1 pr-2">{e.orderIdx}</td>
                                 <td className="py-1 pr-2"><code>{e.method}</code></td>
@@ -29,7 +91,17 @@ export default function EntryTable({ entries, filters, setFilters, selectedIds, 
                                         {e.time ? `${Math.round(e.time)}ms` : '-'}
                                     </span>
                                 </td>
-                                <td className="py-1"><button className="px-2 py-1 border rounded hover:bg-slate-50 dark:hover:bg-slate-800" onClick={() => navigator.clipboard.writeText(e.curl)}>Copy curl</button></td>
+                                <td className="py-1">
+                                    <button 
+                                        className="px-2 py-1 border rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors relative z-10" 
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            navigator.clipboard.writeText(e.curl);
+                                        }}
+                                    >
+                                        Copy curl
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
