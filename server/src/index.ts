@@ -21,8 +21,21 @@ await mockRoutes(app);
 const DEV = process.env.DEV_PROXY === '1';
 if (!DEV) {
     const dist = path.resolve(__dirname, '../../web/dist');
-    await app.register(fastifyStatic, { root: dist, index: ['index.html'] });
-    (app as any).get('/*', (_req: any, reply: any) => reply.sendFile('index.html'));
+    await app.register(fastifyStatic, { 
+        root: dist, 
+        prefix: '/',
+        index: ['index.html'],
+        wildcard: false
+    });
+    
+    // Serve index.html for non-API routes (SPA fallback)
+    app.setNotFoundHandler(async (req, reply) => {
+        if (req.url.startsWith('/api/') || req.url.startsWith('/m/')) {
+            reply.code(404).send({ error: 'not-found' });
+        } else {
+            reply.type('text/html').sendFile('index.html');
+        }
+    });
 }
 
 const port = Number(process.env.PORT || 3000);

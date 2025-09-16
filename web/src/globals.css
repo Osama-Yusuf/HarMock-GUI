@@ -66,6 +66,46 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Remove thick white borders from focus states */
+  *:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Remove default button focus styles */
+  button:focus,
+  input:focus,
+  textarea:focus,
+  select:focus,
+  .card:focus,
+  [role="button"]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border: 1px solid hsl(var(--border)) !important;
+  }
+  
+  /* Remove borders from card components */
+  .card,
+  .border {
+    border: 1px solid hsl(var(--border)) !important;
+  }
+  
+  /* Custom focus styles for accessibility */
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  
+  /* Specifically target table borders */
+  table,
+  th,
+  td {
+    border: 1px solid hsl(var(--border)) !important;
+  }
 }
 
 @layer utilities {
