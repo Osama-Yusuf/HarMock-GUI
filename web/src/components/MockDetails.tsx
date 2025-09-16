@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Badge } from './ui/badge';
 import { Switch } from './ui/switch';
 import { Button } from './ui/button';
-import { Copy, Server, Settings, BarChart3, ChevronUp, ChevronDown } from 'lucide-react';
+import { Copy, Server, Settings, BarChart3, ChevronUp, ChevronDown, Check } from 'lucide-react';
 
 export default function MockDetails({ mock, onToggleMode, onToggleDelay, onToggleBodyMode }: any) {
     const root = `${location.origin}/m/${mock.id}`;
@@ -100,7 +100,7 @@ export default function MockDetails({ mock, onToggleMode, onToggleDelay, onToggl
                         >
                             {urlCopied ? (
                                 <>
-                                    <ChevronDown className="h-4 w-4 text-green-600" />
+                                    <Check className="h-4 w-4 text-green-600" />
                                     Copied!
                                 </>
                             ) : (
