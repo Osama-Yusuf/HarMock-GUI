@@ -9,9 +9,12 @@ export default function MockDetails({ mock, onToggleMode, onToggleDelay, onToggl
     const root = `${location.origin}/m/${mock.id}`;
     const [sortField, setSortField] = useState<string | null>(null);
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [urlCopied, setUrlCopied] = useState(false);
     
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
+        setUrlCopied(true);
+        setTimeout(() => setUrlCopied(false), 2000);
     };
 
     function handleSort(field: string) {
@@ -93,8 +96,16 @@ export default function MockDetails({ mock, onToggleMode, onToggleDelay, onToggl
                             variant="outline" 
                             size="sm"
                             onClick={() => copyToClipboard(root)}
+                            className="flex items-center gap-1"
                         >
-                            <Copy className="h-4 w-4" />
+                            {urlCopied ? (
+                                <>
+                                    <ChevronDown className="h-4 w-4 text-green-600" />
+                                    Copied!
+                                </>
+                            ) : (
+                                <Copy className="h-4 w-4" />
+                            )}
                         </Button>
                     </div>
                 </div>
