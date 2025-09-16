@@ -8,9 +8,10 @@ import SuitePanel from './components/SuitePanel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { Badge } from './components/ui/badge';
+import { Input } from './components/ui/input';
 import { ThemeToggle } from './components/ui/theme-toggle';
 import { storage } from './lib/storage';
-import { RefreshCw, Trash2, Clock, FileText } from 'lucide-react';
+import { RefreshCw, Trash2, Clock, FileText, Search, ChevronDown, ChevronRight } from 'lucide-react';
 import './globals.css';
 
 export default function App() {
@@ -22,6 +23,9 @@ export default function App() {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [savedSession, setSavedSession] = useState<any>(null);
     const [currentFileName, setCurrentFileName] = useState<string>('');
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [showMockDetails, setShowMockDetails] = useState<boolean>(true);
+    const [showEntryDetails, setShowEntryDetails] = useState<boolean>(true);
 
     // Load saved session on app start
     useEffect(() => {
@@ -75,6 +79,28 @@ export default function App() {
         const blob = new Blob([JSON.stringify(suite, null, 2)], { type: 'application/json' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${name || 'suite'}.json`; a.click();
     }
+
+    const filteredEntries = useMemo(() => {
+        return entries.filter(e => {
+            const matchesFilters = (!filters.method || e.method === filters.method) &&
+                (!filters.status || e.status === Number(filters.status));
+            
+            const matchesSearch = !searchQuery || 
+                e.method.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                e.path.toLowerCase().includes(searchQuery.toLowerCase());
+            
+            return matchesFilters && matchesSearch;
+        });
+    }, [entries, filters, searchQuery]);
+
+    const filteredEndpoints = useMemo(() => {
+        if (!mock?.endpoints) return [];
+        return mock.endpoints.filter((endpoint: any) => {
+            return !searchQuery || 
+                endpoint.method.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                endpoint.path.toLowerCase().includes(searchQuery.toLowerCase());
+        });
+    }, [mock?.endpoints, searchQuery]);
 
     function clearSession() {
         storage.clearSession();
@@ -170,51 +196,100 @@ export default function App() {
                     </Card>
                 )}
 
-                {/* Upload Section */}
-                {!mockId && (
-                    <Card className="max-w-2xl mx-auto">
-                        <CardHeader className="text-center">
-                            <CardTitle className="text-2xl">
-                                {savedSession ? 'Start New Session' : 'Get Started'}
-                            </CardTitle>
-                            <CardDescription>
-                                Upload a HAR file to create your mock API server
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Upload onUpload={onUpload} />
+                {/* Search Bar */}
+                {mock && (
+                    <Card>
+                        <CardContent className="pt-6">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                <Input
+                                    placeholder="Search by method or path (e.g., GET, /api/users)"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="pl-10"
+                                />
+                            </div>
                         </CardContent>
                     </Card>
+                )}
+
+                {/* Upload Section */}
+                {!mockId && (
+                    <Upload onUpload={onUpload} />
                 )}
 
                 {/* Mock Details and Controls */}
                 {mock && (
                     <div className="space-y-6">
-                        <MockDetails 
-                            mock={mock} 
-                            onToggleMode={onToggleMode} 
-                            onToggleDelay={onToggleDelay} 
-                            onToggleBodyMode={onToggleBodyMode} 
-                        />
+                        {/* Mock Server Details Section */}
+                        <Card>
+                            <CardHeader>
+                                <button
+                                    onClick={() => setShowMockDetails(!showMockDetails)}
+                                    className="flex items-center justify-between w-full text-left hover:bg-muted/50 rounded p-2 -m-2 transition-colors"
+                                >
+                                    <CardTitle className="flex items-center gap-2">
+                                        {showMockDetails ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                        Mock Server Details
+                                    </CardTitle>
+                                    <Badge variant="outline">
+                                        {filteredEndpoints.length} endpoints
+                                    </Badge>
+                                </button>
+                            </CardHeader>
+                            {showMockDetails && (
+                                <CardContent>
+                                    <MockDetails 
+                                        mock={{...mock, endpoints: filteredEndpoints}} 
+                                        onToggleMode={onToggleMode} 
+                                        onToggleDelay={onToggleDelay} 
+                                        onToggleBodyMode={onToggleBodyMode} 
+                                    />
+                                </CardContent>
+                            )}
+                        </Card>
                         
-                        <EntryTable 
-                            entries={entries} 
-                            filters={filters} 
-                            setFilters={setFilters} 
-                            selectedIds={selectedIds} 
-                            setSelectedIds={setSelectedIds} 
-                            onSelect={onSelectEntry} 
-                            mockId={mock.id} 
-                        />
-                        
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <EntryInspector entry={selectedEntry} />
-                            <SuitePanel onCreate={onCreateSuite} selectedCount={selectedIds.length} />
-                        </div>
+                        {/* Request/Response Details Section */}
+                        <Card>
+                            <CardHeader>
+                                <button
+                                    onClick={() => setShowEntryDetails(!showEntryDetails)}
+                                    className="flex items-center justify-between w-full text-left hover:bg-muted/50 rounded p-2 -m-2 transition-colors"
+                                >
+                                    <CardTitle className="flex items-center gap-2">
+                                        {showEntryDetails ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                        Request/Response Details
+                                    </CardTitle>
+                                    <Badge variant="outline">
+                                        {filteredEntries.length} entries
+                                    </Badge>
+                                </button>
+                            </CardHeader>
+                            {showEntryDetails && (
+                                <CardContent className="space-y-6">
+                                    <EntryTable 
+                                        entries={filteredEntries} 
+                                        filters={filters} 
+                                        setFilters={setFilters} 
+                                        selectedIds={selectedIds} 
+                                        setSelectedIds={setSelectedIds} 
+                                        onSelect={onSelectEntry} 
+                                        mockId={mock.id} 
+                                    />
+                                    
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                        <EntryInspector entry={selectedEntry} />
+                                        <SuitePanel 
+                                            selectedCount={selectedIds.length}
+                                            onCreate={onCreateSuite} 
+                                        />
+                                    </div>
+                                </CardContent>
+                            )}
+                        </Card>
                     </div>
                 )}
             </div>
         </div>
     );
 }
-
