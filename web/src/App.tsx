@@ -8,6 +8,7 @@ import SuitePanel from './components/SuitePanel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { Badge } from './components/ui/badge';
+import { ThemeToggle } from './components/ui/theme-toggle';
 import { storage } from './lib/storage';
 import { RefreshCw, Trash2, Clock, FileText } from 'lucide-react';
 import './globals.css';
@@ -88,7 +89,7 @@ export default function App() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <div className="min-h-screen bg-gradient-light dark:bg-gradient-dark">
             <div className="container mx-auto p-6 space-y-8">
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -102,8 +103,9 @@ export default function App() {
                     </div>
                     
                     {/* Session Controls */}
-                    {mock && (
-                        <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
+                        <ThemeToggle />
+                        {mock && (
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -113,8 +115,8 @@ export default function App() {
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Clear Session
                             </Button>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
 
                 {/* Saved Session Banner */}
