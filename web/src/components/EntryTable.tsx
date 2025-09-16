@@ -14,7 +14,7 @@ export default function EntryTable({ entries, filters, setFilters, selectedIds, 
             <div className="overflow-auto">
                 <table className="min-w-full text-sm">
                     <thead className="text-left text-slate-500">
-                        <tr><th className="py-1 pr-2"></th><th className="py-1 pr-2">#</th><th className="py-1 pr-2">Method</th><th className="py-1 pr-2">Path</th><th className="py-1 pr-2">Status</th><th className="py-1">Curl</th></tr>
+                        <tr><th className="py-1 pr-2"></th><th className="py-1 pr-2">#</th><th className="py-1 pr-2">Method</th><th className="py-1 pr-2">Path</th><th className="py-1 pr-2">Status</th><th className="py-1 pr-2">Time</th><th className="py-1">Curl</th></tr>
                     </thead>
                     <tbody>
                         {entries.map((e: any) => (
@@ -24,6 +24,11 @@ export default function EntryTable({ entries, filters, setFilters, selectedIds, 
                                 <td className="py-1 pr-2"><code>{e.method}</code></td>
                                 <td className="py-1 pr-2"><button className="text-blue-600 hover:underline" onClick={() => onSelect(e.id)}>{e.path}</button></td>
                                 <td className="py-1 pr-2">{e.status}</td>
+                                <td className="py-1 pr-2">
+                                    <span className="text-xs text-slate-600 dark:text-slate-400">
+                                        {e.time ? `${Math.round(e.time)}ms` : '-'}
+                                    </span>
+                                </td>
                                 <td className="py-1"><button className="px-2 py-1 border rounded hover:bg-slate-50 dark:hover:bg-slate-800" onClick={() => navigator.clipboard.writeText(e.curl)}>Copy curl</button></td>
                             </tr>
                         ))}

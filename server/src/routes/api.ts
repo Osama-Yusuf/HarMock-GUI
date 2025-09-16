@@ -76,6 +76,8 @@ export async function apiRoutes(f: FastifyInstance) {
             path: e.path,
             status: e.status,
             contentType: e.contentType,
+            time: e.time,
+            timings: e.timings,
             curl: exampleCurl(mock.id, e, useOriginal)
         }));
     });
@@ -120,7 +122,7 @@ export async function apiRoutes(f: FastifyInstance) {
                 method: e.method,
                 path: e.path,
                 query: e.query,
-                headers: { 'content-type': e.reqHeaders['content-type'] || undefined },
+                headers: e.contentType ? { 'content-type': e.contentType } : undefined,
                 body: e.reqBodyScrubbed ? parseMaybeJson(e.reqHeaders['content-type'], e.reqBodyScrubbed) : undefined,
                 expectStatus: e.status,
                 assertions: body?.assertions || [],
@@ -144,7 +146,7 @@ function summarizeEndpoints(entries: any[]) {
     const map = new Map<string, { method: string; path: string; count: number; statuses: number[] }>();
     for (const e of entries) {
         const key = `${e.method} ${e.path}`;
-        const v = map.get(key) || { method: e.method, path: e.path, count: 0, statuses: [] };
+        const v = map.get(key) || { method: e.method, path: e.path, count: 0, statuses: [] as number[] };
         v.count++; v.statuses.push(e.status);
         map.set(key, v);
     }

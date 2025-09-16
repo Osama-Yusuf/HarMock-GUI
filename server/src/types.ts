@@ -21,6 +21,8 @@ export interface MockEntry {
     respBodyScrubbed?: Buffer | null;
     contentType?: string;
     waitMs?: number; // captured wait timing
+    time?: number; // total request time in milliseconds
+    timings?: { wait?: number; dns?: number; connect?: number; send?: number; receive?: number };
 }
 
 export interface SuiteAssertion {

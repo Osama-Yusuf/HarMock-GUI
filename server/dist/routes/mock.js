@@ -58,18 +58,36 @@ export async function mockRoutes(f) {
         const headersOut = { ...entry.respHeaders };
         // Never set sensitive headers
         delete headersOut['set-cookie'];
+        // Body we serve is not compressed; remove encoding if present
+        delete headersOut['content-encoding'];
         if (entry.contentType)
             headersOut['content-type'] = entry.contentType;
-        reply.code(entry.status);
+        // If HAR captured a 304 with a body, serve it with 200 to ensure body is delivered
+        const hasBodyOriginal = !!entry.respBodyOriginal && entry.respBodyOriginal.byteLength > 0;
+        const hasBodyScrubbed = !!entry.respBodyScrubbed && entry.respBodyScrubbed.byteLength > 0;
+        const harWas304 = entry.status === 304;
+        const shouldCoerceTo200 = harWas304 && (hasBodyOriginal || hasBodyScrubbed);
+        if (shouldCoerceTo200)
+            reply.header('X-Har-Original-Status', String(entry.status));
+        reply.code(shouldCoerceTo200 ? 200 : entry.status);
         for (const [k, v] of Object.entries(headersOut))
             reply.header(k, v);
         const useOriginal = mock.bodyMode === 'original';
-        if (useOriginal && entry.respBodyOriginal) {
-            return reply.send(entry.respBodyOriginal);
+        let bodyBuf = (useOriginal && entry.respBodyOriginal) ? entry.respBodyOriginal : entry.respBodyScrubbed || null;
+        // If HTML, inject prefixing script so in-app fetch/XHR hit the mock root
+        const ctLower = (headersOut['content-type'] || '').toLowerCase();
+        if (bodyBuf && ctLower.includes('text/html')) {
+            // Remove CSP response header for HTML so local scripts can load while mocking
+            delete headersOut['content-security-policy'];
+            const injected = injectPrefixScript(stripMetaCsp(bodyBuf.toString('utf8')), mock.id);
+            if (injected !== null) {
+                delete headersOut['content-length'];
+                delete headersOut['etag'];
+                bodyBuf = Buffer.from(injected, 'utf8');
+            }
         }
-        if (entry.respBodyScrubbed) {
-            return reply.send(entry.respBodyScrubbed);
-        }
+        if (bodyBuf)
+            return reply.send(bodyBuf);
         return reply.send();
     });
 }
@@ -91,4 +109,16 @@ function subsetQuery(a, b) {
                 return false;
     }
     return true;
+}
+function injectPrefixScript(html, mockId) {
+    const script = `\n<script>(function(){\n  var BASE = '/m/${mockId}';\n  function rewrite(u){\n    try{\n      if(/^https?:\\\/\\\//i.test(u)){\n        var url = new URL(u, location.href);\n        if(url.origin===location.origin && !url.pathname.startsWith(BASE)){\n          url.pathname = BASE + (url.pathname.startsWith('/')?url.pathname:'/'+url.pathname);\n          return url.toString();\n        }\n        return u;\n      }\n      if(u.startsWith('/')){\n        return u.startsWith(BASE+'/')?u:(BASE+u);\n      }\n      return u;\n    }catch(e){ return u; }\n  }\n  var _fetch = window.fetch;\n  window.fetch = function(i, init){\n    if(typeof i==='string'){ i = rewrite(i); }\n    else if(i && i.url){ i = new Request(rewrite(i.url), i); }\n    return _fetch(i, init);\n  };\n  var _open = XMLHttpRequest.prototype.open;\n  XMLHttpRequest.prototype.open = function(m,u,a,u2,p){\n    try{ u = rewrite(String(u)); }catch(e){}\n    return _open.call(this,m,u,a,u2,p);\n  };\n})();</script>`;
+    if (html.includes('</head>'))
+        return html.replace('</head>', script + '\n</head>');
+    if (html.includes('</body>'))
+        return html.replace('</body>', script + '\n</body>');
+    return html + script;
+}
+function stripMetaCsp(html) {
+    // Remove <meta http-equiv="Content-Security-Policy" ...>
+    return html.replace(/<meta[^>]*http-equiv=["']Content-Security-Policy["'][^>]*>\s*/gi, '');
 }

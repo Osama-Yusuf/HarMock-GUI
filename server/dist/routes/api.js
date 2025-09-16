@@ -67,6 +67,7 @@ export async function apiRoutes(f) {
         const mock = store.mocks.get(mockId);
         if (!mock)
             return reply.code(404).send({ error: 'mock-not-found' });
+        const useOriginal = mock.bodyMode === 'original';
         const { path, method, status } = (req.query || {});
         const list = mock.entries.filter(e => (!path || e.path === path) && (!method || e.method === String(method).toUpperCase()) && (!status || e.status === Number(status)));
         return list.map(e => ({
@@ -76,7 +77,9 @@ export async function apiRoutes(f) {
             path: e.path,
             status: e.status,
             contentType: e.contentType,
-            curl: exampleCurl(mock.id, e)
+            time: e.time,
+            timings: e.timings,
+            curl: exampleCurl(mock.id, e, useOriginal)
         }));
     });
     // Entry preview
@@ -85,9 +88,12 @@ export async function apiRoutes(f) {
         const mock = store.mocks.get(mockId);
         if (!mock)
             return reply.code(404).send({ error: 'mock-not-found' });
+        const useOriginal = mock.bodyMode === 'original';
         const e = mock.entries.find(x => x.id === entryId);
         if (!e)
             return reply.code(404).send({ error: 'entry-not-found' });
+        const reqBodyBuf = useOriginal && e.reqBodyOriginal ? e.reqBodyOriginal : e.reqBodyScrubbed || null;
+        const respBodyBuf = useOriginal && e.respBodyOriginal ? e.respBodyOriginal : e.respBodyScrubbed || null;
         return {
             id: e.id,
             orderIdx: e.orderIdx,
@@ -96,10 +102,10 @@ export async function apiRoutes(f) {
             query: e.query,
             headerFp: e.headerFp,
             reqHeaders: e.reqHeaders,
-            reqBody: e.reqBodyScrubbed ? safeBodyPreview(e.reqBodyScrubbed, e.reqHeaders['content-type']) : null,
+            reqBody: reqBodyBuf ? safeBodyPreview(reqBodyBuf, e.reqHeaders['content-type']) : null,
             status: e.status,
             respHeaders: e.respHeaders,
-            respBody: e.respBodyScrubbed ? safeBodyPreview(e.respBodyScrubbed, e.contentType) : null
+            respBody: respBodyBuf ? safeBodyPreview(respBodyBuf, e.contentType) : null
         };
     });
     // Suites
@@ -118,7 +124,7 @@ export async function apiRoutes(f) {
             method: e.method,
             path: e.path,
             query: e.query,
-            headers: { 'content-type': e.reqHeaders['content-type'] || undefined },
+            headers: e.contentType ? { 'content-type': e.contentType } : undefined,
             body: e.reqBodyScrubbed ? parseMaybeJson(e.reqHeaders['content-type'], e.reqBodyScrubbed) : undefined,
             expectStatus: e.status,
             assertions: body?.assertions || [],
@@ -167,9 +173,10 @@ function safeBodyPreview(buf, ct) {
         base64: isJson ? undefined : slice.toString('base64')
     };
 }
-function exampleCurl(mockId, e) {
+function exampleCurl(mockId, e, useOriginal) {
     const q = e.querySorted ? `?${e.querySorted}` : '';
-    const body = e.reqBodyScrubbed ? `\\\n  --data '${e.reqBodyScrubbed.toString('utf8').replace(/'/g, "'\\''")}'` : '';
+    const bodyBuf = useOriginal && e.reqBodyOriginal ? e.reqBodyOriginal : e.reqBodyScrubbed;
+    const body = bodyBuf ? `\\\n  --data '${bodyBuf.toString('utf8').replace(/'/g, "'\\''")}'` : '';
     const ct = e.reqHeaders['content-type'] ? `\\\n  -H 'Content-Type: ${e.reqHeaders['content-type']}'` : '';
     return `curl -i -X ${e.method} 'http://localhost:3000/m/${mockId}${e.path}${q}'${ct}${body}`;
 }

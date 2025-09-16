@@ -17,8 +17,9 @@ export function parseHar(buffer) {
         const respHeadersRaw = Object.fromEntries((e.response.headers || []).map(h => [h.name.toLowerCase(), h.value]));
         const reqHeaders = dropSensitiveHeaders(reqHeadersRaw);
         const respHeadersScrubbed = dropSensitiveHeaders(respHeadersRaw);
-        const contentTypeReq = reqHeadersRaw['content-type'];
-        const contentTypeResp = respHeadersRaw['content-type'];
+        // Prefer explicit headers, but fall back to HAR mimeType when header is absent
+        const contentTypeReq = reqHeadersRaw['content-type'] || e.request.postData?.mimeType;
+        const contentTypeResp = respHeadersRaw['content-type'] || e.response.content?.mimeType;
         const reqBodyBuf = readBody(e.request.postData);
         const respBodyBuf = readBody(e.response.content);
         const reqBodyScrub = maybeRedactBody(contentTypeReq, reqBodyBuf);
@@ -44,7 +45,9 @@ export function parseHar(buffer) {
             respBodyOriginal: respBodyBuf,
             respBodyScrubbed: respBodyScrub,
             contentType: contentTypeResp,
-            waitMs: e.timings?.wait && e.timings.wait > 0 ? Math.floor(e.timings.wait) : undefined
+            waitMs: e.timings?.wait && e.timings.wait > 0 ? Math.floor(e.timings.wait) : undefined,
+            time: e.time || 0,
+            timings: e.timings
         };
         return entry;
     });

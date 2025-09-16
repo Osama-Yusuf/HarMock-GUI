@@ -4,6 +4,7 @@ import type { MockEntry } from '../types.js';
 
 interface HarLogEntry {
     startedDateTime: string;
+    time: number;
     request: {
         method: string;
         url: string;
@@ -16,7 +17,7 @@ interface HarLogEntry {
         headers: { name: string; value: string }[];
         content?: { mimeType?: string; text?: string; encoding?: string };
     };
-    timings?: { wait?: number };
+    timings?: { wait?: number; dns?: number; connect?: number; send?: number; receive?: number };
 }
 
 export function parseHar(buffer: Buffer): MockEntry[] {
@@ -69,7 +70,9 @@ export function parseHar(buffer: Buffer): MockEntry[] {
             respBodyOriginal: respBodyBuf,
             respBodyScrubbed: respBodyScrub,
             contentType: contentTypeResp,
-            waitMs: e.timings?.wait && e.timings.wait > 0 ? Math.floor(e.timings.wait) : undefined
+            waitMs: e.timings?.wait && e.timings.wait > 0 ? Math.floor(e.timings.wait) : undefined,
+            time: e.time || 0,
+            timings: e.timings
         };
         return entry;
     });
