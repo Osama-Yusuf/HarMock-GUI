@@ -52,11 +52,11 @@ export default function Upload({ onUpload }: { onUpload: (f: File) => void }) {
                             
                             <div className="space-y-2 text-center">
                                 <h3 className="text-lg font-semibold">Upload HAR File</h3>
-                                <p className="text-muted-foreground">
+                                <div className="text-muted-foreground">
                                     Drag & drop a <Badge variant="secondary" className="mx-1">
                                         <FileText className="h-3 w-3 mr-1" />.har
                                     </Badge> file here
-                                </p>
+                                </div>
                             </div>
                             
                             <div className="flex items-center space-x-2">

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -85,19 +87,19 @@
     border: 1px solid hsl(var(--border)) !important;
   }
   
-  /* Remove borders from card components */
-  .card,
-  .border {
-    border: 1px solid hsl(var(--border)) !important;
+  /* Professional tech-inspired font styles */
+  .glitch-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: all 0.3s ease;
   }
-  
-  /* Custom focus styles for accessibility */
-  button:focus-visible,
-  input:focus-visible,
-  textarea:focus-visible,
-  select:focus-visible {
-    outline: 2px solid hsl(var(--ring));
-    outline-offset: 2px;
+
+  .glitch-title:hover {
+    transform: scale(1.02);
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
   }
   
   /* Specifically target table borders */

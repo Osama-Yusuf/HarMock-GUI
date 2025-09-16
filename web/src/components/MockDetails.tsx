@@ -3,7 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Badge } from './ui/badge';
 import { Switch } from './ui/switch';
 import { Button } from './ui/button';
-import { Copy, Server, Settings, BarChart3, ChevronUp, ChevronDown, Check } from 'lucide-react';
+import { Copy, Server, Settings, BarChart3, ChevronUp, ChevronDown, Check, HelpCircle } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 export default function MockDetails({ mock, onToggleMode, onToggleDelay, onToggleBodyMode }: any) {
     const root = `${location.origin}/m/${mock.id}`;
@@ -43,14 +49,14 @@ export default function MockDetails({ mock, onToggleMode, onToggleDelay, onToggl
         return 0;
     });
 
-    function SortableHeader({ field, children }: { field: string; children: React.ReactNode }) {
+    function SortableHeader({ field, children, className = "" }: { field: string; children: React.ReactNode; className?: string }) {
         const isActive = sortField === field;
         return (
             <th 
-                className="text-left py-2 px-3 font-medium cursor-pointer hover:bg-muted/70 select-none transition-colors"
+                className={`text-left py-2 px-3 font-medium cursor-pointer hover:bg-muted/70 select-none transition-colors ${className}`}
                 onClick={() => handleSort(field)}
             >
-                <div className="flex items-center gap-1">
+                <div className={`flex items-center gap-1 ${className.includes('text-center') ? 'justify-center' : ''}`}>
                     {children}
                     {isActive && (
                         sortDirection === 'asc' ? 
@@ -113,10 +119,20 @@ export default function MockDetails({ mock, onToggleMode, onToggleDelay, onToggl
                 {/* Controls */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-2">
-                            <Settings className="h-4 w-4" />
-                            Mode
-                        </label>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <label className="text-sm font-medium flex items-center gap-2 cursor-help">
+                                        <Settings className="h-4 w-4" />
+                                        Mode
+                                        <HelpCircle className="h-3 w-3 text-slate-400" />
+                                    </label>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Endpoint: Match requests by URL/method<br/>Sequence: Replay requests in recorded order</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                         <select 
                             className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
                             value={mock.mode} 
@@ -141,7 +157,19 @@ export default function MockDetails({ mock, onToggleMode, onToggleDelay, onToggl
                     </div>
                     
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Body Mode</label>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <label className="text-sm font-medium flex items-center gap-2 cursor-help">
+                                        Body Mode
+                                        <HelpCircle className="h-3 w-3 text-slate-400" />
+                                    </label>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Scrubbed: Remove sensitive data (passwords, tokens)<br/>Original: Return exact HAR response bodies</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                         <select 
                             className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
                             value={mock.bodyMode || 'scrubbed'} 
@@ -160,28 +188,35 @@ export default function MockDetails({ mock, onToggleMode, onToggleDelay, onToggl
                         <table className="w-full text-sm">
                             <thead className="bg-muted/50">
                                 <tr className="border-b">
-                                    <SortableHeader field="method">Method</SortableHeader>
+                                    <SortableHeader field="method" className="text-center">Method</SortableHeader>
                                     <SortableHeader field="path">Path</SortableHeader>
-                                    <SortableHeader field="count">Count</SortableHeader>
-                                    <th className="text-left py-2 px-3 font-medium">Status (min/avg/max)</th>
+                                    <SortableHeader field="count" className="text-center">Count</SortableHeader>
+                                    <SortableHeader field="minStatus" className="text-center">
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span className="cursor-help">Status</span>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Min/Avg/Max HTTP status codes for this endpoint</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    </SortableHeader>
                                 </tr>
                             </thead>
                             <tbody>
-                                {sortedEndpoints.map((e: any) => (
-                                    <tr key={`${e.method}-${e.path}`} className="border-b last:border-b-0 hover:bg-muted/30">
-                                        <td className="py-2 px-3">
+                                {sortedEndpoints.map((endpoint: any, i: number) => (
+                                    <tr key={i} className="border-b hover:bg-muted/30 transition-colors">
+                                        <td className="py-2 px-3 text-center">
                                             <Badge variant="outline" className="font-mono text-xs">
-                                                {e.method}
+                                                {endpoint.method}
                                             </Badge>
                                         </td>
-                                        <td className="py-2 px-3">
-                                            <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                                                {e.path}
-                                            </code>
-                                        </td>
-                                        <td className="py-2 px-3">{e.count}</td>
-                                        <td className="py-2 px-3 font-mono text-xs">
-                                            {e.minStatus}/{e.avgStatus}/{e.maxStatus}
+                                        <td className="py-2 px-3 font-mono text-xs">{endpoint.path}</td>
+                                        <td className="py-2 px-3 text-muted-foreground text-center">{endpoint.count}</td>
+                                        <td className="py-2 px-3 text-muted-foreground text-center font-mono text-xs">
+                                            {endpoint.minStatus}/{endpoint.avgStatus}/{endpoint.maxStatus}
                                         </td>
                                     </tr>
                                 ))}

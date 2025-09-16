@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronUp, ChevronDown, Check } from 'lucide-react';
+import { ChevronUp, ChevronDown, Copy, Check } from 'lucide-react';
 
 export default function EntryTable({ entries, filters, setFilters, selectedIds, setSelectedIds, onSelect, mockId }: any) {
     const [sortField, setSortField] = useState<string | null>(null);
@@ -42,14 +42,14 @@ export default function EntryTable({ entries, filters, setFilters, selectedIds, 
         return 0;
     });
 
-    function SortableHeader({ field, children }: { field: string; children: React.ReactNode }) {
+    function SortableHeader({ field, children, className = "" }: { field: string; children: React.ReactNode; className?: string }) {
         const isActive = sortField === field;
         return (
             <th 
-                className="py-1 pr-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 select-none"
+                className={`py-1 pr-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 select-none ${className}`}
                 onClick={() => handleSort(field)}
             >
-                <div className="flex items-center gap-1">
+                <div className="flex items-center justify-center gap-1">
                     {children}
                     {isActive && (
                         sortDirection === 'asc' ? 
@@ -71,30 +71,30 @@ export default function EntryTable({ entries, filters, setFilters, selectedIds, 
                     <thead className="text-left text-slate-500">
                         <tr>
                             <th className="py-1 pr-2"></th>
-                            <SortableHeader field="orderIdx">#</SortableHeader>
-                            <SortableHeader field="method">Method</SortableHeader>
+                            <SortableHeader field="orderIdx" className="text-center">#</SortableHeader>
+                            <SortableHeader field="method" className="text-center">Method</SortableHeader>
                             <SortableHeader field="path">Path</SortableHeader>
-                            <SortableHeader field="status">Status</SortableHeader>
-                            <SortableHeader field="time">Time</SortableHeader>
-                            <th className="py-1">Curl</th>
+                            <SortableHeader field="status" className="text-center">Status</SortableHeader>
+                            <SortableHeader field="time" className="text-center">Time</SortableHeader>
+                            <th className="py-1 text-center">Curl</th>
                         </tr>
                     </thead>
                     <tbody>
                         {sortedEntries.map((e: any) => (
                             <tr key={e.id} className="border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                                 <td className="py-1 pr-2"><input type="checkbox" checked={selectedIds.includes(e.id)} onChange={() => toggle(e.id)} /></td>
-                                <td className="py-1 pr-2">{e.orderIdx}</td>
-                                <td className="py-1 pr-2"><code>{e.method}</code></td>
+                                <td className="py-1 pr-2 text-center">{e.orderIdx}</td>
+                                <td className="py-1 pr-2 text-center"><code>{e.method}</code></td>
                                 <td className="py-1 pr-2"><button className="text-blue-600 hover:underline" onClick={() => onSelect(e.id)}>{e.path}</button></td>
-                                <td className="py-1 pr-2">{e.status}</td>
-                                <td className="py-1 pr-2">
+                                <td className="py-1 pr-2 text-center">{e.status}</td>
+                                <td className="py-1 pr-2 text-center">
                                     <span className="text-xs text-slate-600 dark:text-slate-400">
                                         {e.time ? `${Math.round(e.time)}ms` : '-'}
                                     </span>
                                 </td>
-                                <td className="py-1">
+                                <td className="py-1 text-center">
                                     <button 
-                                        className="px-2 py-1 border rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors relative z-10 flex items-center gap-1" 
+                                        className="px-2 py-1 border rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors relative z-10 flex items-center gap-1 mx-auto" 
                                         onClick={(event) => {
                                             event.stopPropagation();
                                             navigator.clipboard.writeText(e.curl);

@@ -118,9 +118,18 @@ export default function App() {
         <div className="min-h-screen bg-gradient-light dark:bg-gradient-dark">
             <div className="container mx-auto p-6 space-y-8">
                 {/* Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                    {/* Left spacer - matches right side width */}
+                    <div className="flex items-center gap-2 w-32">
+                        {/* Empty spacer to balance the right side */}
+                    </div>
+                    
+                    {/* Centered title */}
                     <div className="text-center flex-1 space-y-2">
-                        <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <h1 
+                            className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent glitch-title"
+                            data-text="HARMOCK"
+                        >
                             HarMock
                         </h1>
                         <p className="text-muted-foreground text-lg">
@@ -129,14 +138,14 @@ export default function App() {
                     </div>
                     
                     {/* Session Controls */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 w-32 justify-end">
                         <ThemeToggle />
                         {mock && (
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={clearSession}
-                                className="text-destructive hover:text-destructive"
+                                className="text-red-400 hover:text-red-300 dark:text-red-400 dark:hover:text-red-300"
                             >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Clear Session
