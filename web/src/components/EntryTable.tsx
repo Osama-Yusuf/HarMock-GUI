@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown, Check } from 'lucide-react';
 
 export default function EntryTable({ entries, filters, setFilters, selectedIds, setSelectedIds, onSelect, mockId }: any) {
     const [sortField, setSortField] = useState<string | null>(null);
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [copiedId, setCopiedId] = useState<string | null>(null);
 
     function toggle(id: string) {
         if (selectedIds.includes(id)) setSelectedIds(selectedIds.filter((x: string) => x !== id));
@@ -93,13 +94,22 @@ export default function EntryTable({ entries, filters, setFilters, selectedIds, 
                                 </td>
                                 <td className="py-1">
                                     <button 
-                                        className="px-2 py-1 border rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors relative z-10" 
+                                        className="px-2 py-1 border rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors relative z-10 flex items-center gap-1" 
                                         onClick={(event) => {
                                             event.stopPropagation();
                                             navigator.clipboard.writeText(e.curl);
+                                            setCopiedId(e.id);
+                                            setTimeout(() => setCopiedId(null), 2000);
                                         }}
                                     >
-                                        Copy curl
+                                        {copiedId === e.id ? (
+                                            <>
+                                                <Check className="h-3 w-3 text-green-600" />
+                                                Copied!
+                                            </>
+                                        ) : (
+                                            'Copy curl'
+                                        )}
                                     </button>
                                 </td>
                             </tr>
