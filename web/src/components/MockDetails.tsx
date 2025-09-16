@@ -1,16 +1,63 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Switch } from './ui/switch';
 import { Button } from './ui/button';
-import { Copy, Server, Settings, BarChart3 } from 'lucide-react';
+import { Copy, Server, Settings, BarChart3, ChevronUp, ChevronDown } from 'lucide-react';
 
 export default function MockDetails({ mock, onToggleMode, onToggleDelay, onToggleBodyMode }: any) {
     const root = `${location.origin}/m/${mock.id}`;
+    const [sortField, setSortField] = useState<string | null>(null);
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
     };
+
+    function handleSort(field: string) {
+        if (sortField === field) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDirection('asc');
+        }
+    }
+
+    const sortedEndpoints = [...mock.endpoints].sort((a, b) => {
+        if (!sortField) return 0;
+        
+        let aVal = a[sortField];
+        let bVal = b[sortField];
+        
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+            return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        }
+        
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+            return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+        }
+        
+        return 0;
+    });
+
+    function SortableHeader({ field, children }: { field: string; children: React.ReactNode }) {
+        const isActive = sortField === field;
+        return (
+            <th 
+                className="text-left py-2 px-3 font-medium cursor-pointer hover:bg-muted/70 select-none transition-colors"
+                onClick={() => handleSort(field)}
+            >
+                <div className="flex items-center gap-1">
+                    {children}
+                    {isActive && (
+                        sortDirection === 'asc' ? 
+                        <ChevronUp className="h-3 w-3" /> : 
+                        <ChevronDown className="h-3 w-3" />
+                    )}
+                </div>
+            </th>
+        );
+    }
     
     return (
         <Card>
@@ -102,14 +149,14 @@ export default function MockDetails({ mock, onToggleMode, onToggleDelay, onToggl
                         <table className="w-full text-sm">
                             <thead className="bg-muted/50">
                                 <tr className="border-b">
-                                    <th className="text-left py-2 px-3 font-medium">Method</th>
-                                    <th className="text-left py-2 px-3 font-medium">Path</th>
-                                    <th className="text-left py-2 px-3 font-medium">Count</th>
+                                    <SortableHeader field="method">Method</SortableHeader>
+                                    <SortableHeader field="path">Path</SortableHeader>
+                                    <SortableHeader field="count">Count</SortableHeader>
                                     <th className="text-left py-2 px-3 font-medium">Status (min/avg/max)</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {mock.endpoints.map((e: any) => (
+                                {sortedEndpoints.map((e: any) => (
                                     <tr key={`${e.method}-${e.path}`} className="border-b last:border-b-0 hover:bg-muted/30">
                                         <td className="py-2 px-3">
                                             <Badge variant="outline" className="font-mono text-xs">
