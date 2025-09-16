@@ -1,0 +1,34 @@
+# Development files
+node_modules/
+*.log
+.env*
+.DS_Store
+
+# Source files (only ship built files)
+server/src/
+web/src/
+scripts/
+*.ts
+!*.d.ts
+
+# Development configs
+tsconfig*.json
+vite.config.ts
+tailwind.config.js
+postcss.config.js
+components.json
+
+# Development dependencies
+pnpm-lock.yaml
+pnpm-workspace.yaml
+
+# IDE files
+.vscode/
+.idea/
+
+# Test files
+**/*.test.*
+**/__tests__/
+
+# Documentation (keep README.md)
+setup-har-mockup-server-saas.md

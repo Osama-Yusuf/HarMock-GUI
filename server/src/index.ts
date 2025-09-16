@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
@@ -25,6 +27,7 @@ if (!DEV) {
 
 const port = Number(process.env.PORT || 3000);
 (app as any).listen({ port, host: '0.0.0.0' }).then(() => {
-    console.log(`Server on http://localhost:${port}`);
+    console.log(`🚀 Harmock running on http://localhost:${port}`);
+    console.log(`📁 Upload HAR files and create mock APIs instantly!`);
 });
 

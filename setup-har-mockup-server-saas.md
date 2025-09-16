@@ -1,6 +1,6 @@
 # har-mock-mvp
 
-A minimal, local-only HAR → Mock Server MVP.
+A minimal, local-only Harmock MVP.
 
 ```
 .
@@ -917,7 +917,7 @@ export default function App() {
 
   return (
     <div className="container">
-      <h1>HAR → Mock Server</h1>
+      <h1>Harmock</h1>
       {!mockId && <Upload onUpload={onUpload} />}
       {mock && (
         <>
@@ -1210,7 +1210,7 @@ function toJUnit(xmlName: string, cases: { name: string; ok: boolean; message?: 
 ## README.md
 
 ````md
-# HAR → Mock Server MVP
+# Harmock MVP
 
 Local-only, single-repo, no auth, no DB. Upload a HAR and get a mock API at `/m/{mockId}`. Two modes: sequence and endpoint. Delay simulation optional. Suites runner included.
 

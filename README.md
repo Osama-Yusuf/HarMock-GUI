@@ -1,19 +1,55 @@
-# HAR → Mock Server MVP
+# 🚀 Harmock
 
-Local-only, single-repo, no auth, no DB. Upload a HAR and get a mock API at `/m/{mockId}`. Two modes: sequence and endpoint. Delay simulation optional. Suites runner included.
+Transform HAR files into powerful mock APIs with a beautiful web interface. Perfect for development, testing, and API prototyping.
 
-## Run
+## ✨ Features
+
+- 🎯 **Drag & Drop HAR Upload** - Simply drop your HAR files to create instant mock APIs
+- 🌙 **Beautiful Dark Mode UI** - Modern interface with theme switching
+- ⚡ **Real-time Load Time Display** - See actual request timings from your HAR files
+- 🔍 **Advanced Search & Filtering** - Find endpoints quickly with method and path search
+- 📊 **Sortable Tables** - Click column headers to sort by method, path, status, or timing
+- 🎛️ **Collapsible Sections** - Organize large HAR files with toggleable sections
+- 💾 **Session Persistence** - Your uploads are saved locally for quick access
+- 🔄 **Two Mock Modes** - Sequence mode for workflows, endpoint mode for individual calls
+- ⏱️ **Realistic Delay Simulation** - Simulate actual network delays from HAR timings
+- 📋 **One-click Copy** - Copy curl commands and mock URLs with visual confirmation
+- 🧪 **Test Suite Generation** - Create and run test suites from selected requests
+
+## 🚀 Quick Start
+
+### Installation
 
 ```bash
-# dev (server on :3000, Vite on :5173, backend proxies frontend)
-npm install
-npm run dev
-# open http://localhost:3000
+npm install -g harmock-gui
+```
 
-# prod
+### Usage
+
+```bash
+# Start the server
+npx harmock-gui
+
+# Or run locally
+harmock-gui
+```
+
+Open http://localhost:5173 and start uploading HAR files!
+
+### Development
+
+```bash
+# Clone and install
+git clone https://github.com/Osama-Yusuf/HarMock
+cd HarMock
+npm install
+
+# Development mode
+npm run dev
+
+# Production build
 npm run build
-npm run start
-# open http://localhost:3000
+npm start
 ```
 
 ## Use
@@ -53,12 +89,6 @@ A JUnit report writes to `./suite-report.xml`.
 * Drop headers: `cookie, authorization, set-cookie`.
 * JSON bodies: redact keys by `/password|token|email|phone|card|cvv|ssn/i` → `"REDACTED"`.
 * Only scrubbed versions are served.
-
-## Tests
-
-```bash
-npm -w server run test
-```
 
 ## Notes
 

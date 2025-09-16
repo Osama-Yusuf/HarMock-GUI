@@ -1,6 +1,40 @@
 {
-    "name": "har-mock-mvp",
-    "private": true,
+    "name": "harmock-gui",
+    "version": "1.0.0",
+    "description": "Transform HAR files into powerful mock APIs with a beautiful web interface",
+    "main": "server/dist/index.js",
+    "bin": {
+        "harmock": "server/dist/index.js"
+    },
+    "keywords": [
+        "har",
+        "mock",
+        "api",
+        "testing",
+        "development",
+        "server",
+        "http",
+        "web"
+    ],
+    "author": "Osama Mohamed <osama9mohamed5@gmail.com>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Osama-Yusuf/HarMock.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Osama-Yusuf/harmock/issues"
+    },
+    "homepage": "https://github.com/Osama-Yusuf/harmock#readme",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "files": [
+        "server/dist/**/*",
+        "web/dist/**/*",
+        "README.md",
+        "LICENSE"
+    ],
     "workspaces": [
         "server",
         "web"
@@ -12,7 +46,9 @@
         "build": "npm -w web run build && npm -w server run build",
         "start": "node server/dist/index.js",
         "test": "npm -w server run test",
-        "suite": "tsx scripts/suite-runner.ts"
+        "suite": "tsx scripts/suite-runner.ts",
+        "prepublishOnly": "npm run build",
+        "postinstall": "echo 'Harmock installed! Run: npx harmock to get started'"
     },
     "devDependencies": {
         "concurrently": "^9.0.1",
